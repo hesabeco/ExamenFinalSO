@@ -1,15 +1,13 @@
 
-function validateForm() {
+  function validateForm(){
     var input = document.getElementById('cantidadProcesos');
     if (input.checkValidity() === false) {
       alert('Please enter a valid number greater than or equal to 1.');
-      return false;
     }
-  
+    
     var cantidadProcesos = parseInt(input.value);
     generateLabels(cantidadProcesos);
-  
-    return true;
+    
   }
   
   function generateLabels(cantidadProcesos) {
@@ -36,10 +34,15 @@ function validateForm() {
   
       labelsContainer.appendChild(divContainer);
     }
+
+    var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasNavbar'));
+    offcanvas.show();
+
   }
   
   document.addEventListener('DOMContentLoaded', function () {
     var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasNavbar'));
     offcanvas.show();
   });
+
   

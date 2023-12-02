@@ -26,17 +26,13 @@
               <a class="nav-link active" aria-current="page" href="#">Home</a>
             </li>
           </ul>
-          <form class="d-flex flex-column" onsubmit="return validateForm()" novalidate>
+          <form class="d-flex flex-column">
             <label for="cantidadProcesos" class="mb-2">Please enter the number of processes:</label>
             <input id="cantidadProcesos" class="form-control me-2" type="number" placeholder="Enter the number" aria-label="Number of processes" min="1" value="1" required>
-            <button class="btn btn-outline-success mt-2" type="submit">Confirm</button>
+            <button type="button" class="btn btn-outline-success mt-2" onclick="validateForm()">Confirm</button>
           </form>
           <div id="labelsContainer"></div>
-          <script src="js.js"></script>
-          
-          
-          
-          
+          <script src="script.js"></script>
         </div>
       </div>
     </div>
