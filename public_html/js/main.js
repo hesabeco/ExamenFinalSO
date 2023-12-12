@@ -14,10 +14,15 @@ function addProcess() {
     const infoProcess = inputElement.value.trim();
 
     if (infoProcess !== '') {
+        const elements = infoProcess.split(',');
+        const isValid = validateElements(elements);
+        if (isValid) {
         PROCESS.push(infoProcess);
         inputElement.value = '';
         document.getElementById("size").textContent = PROCESS.length;
-
+        }
+    } else {
+    alert("Please enter process information separated by commas."); 
     }
 }
 
@@ -57,8 +62,14 @@ function dispatcher(){
       // read window :
       cyclesDispatcher = prompt("Dispatcher Cycles:");
       cyclesInterrupts = prompt("Interrupts Cycles:");
-      
-      
+   
+      cyclesDispatcher = parseInt(cyclesDispatcher);
+      cyclesInterrupts = parseInt(cyclesInterrupts);
+
+    if (isNaN(cyclesDispatcher) || isNaN(cyclesInterrupts) || cyclesDispatcher <= 0 || cyclesInterrupts < cyclesDispatcher) {
+        alert("Invalid input. Please enter valid values. Dispatcher Cycles should be greater than 0, and Interrupts Cycles should be greater or equal to Dispatcher Cycles.");
+        return;
+    }
 
       // Show data
       document.getElementById("result").innerHTML = `
@@ -67,3 +78,41 @@ function dispatcher(){
       `;
     }
 
+    function validateElements(elements) {
+        let isValid = true;
+        let consecutiveNumber = 0;
+    
+        for (let i = 0; i < elements.length; i++) {
+            const element = elements[i];
+    
+            if (isNaN(element)) {
+                if (element !== 'T' && element !== 'I' && element !== 'F') {
+                    isValid = false;
+                    alert("Invalid element: " + element + ". Should be 'T', 'I', or 'F'");
+                    break;
+                }
+                if (element === 'F' && i !== elements.length - 1) {
+                    isValid = false;
+                    alert("Invalid element: 'F' should be the last element.");
+                    break;
+                }
+            } else {
+                const number = parseInt(element);
+                if (i == 0 && number !== 1) {
+                    isValid = false;
+                    alert("Invalid element: " + element + ". Sequence should start with '1'.");
+                    break;
+                }
+                if (number !== consecutiveNumber + 1) {
+                    isValid = false;
+                    alert("Invalid element: " + element + ". Should be consecutive.");
+                    break;
+                }
+    
+                consecutiveNumber = number;
+            }
+        }
+    
+        return isValid;
+    }
+    

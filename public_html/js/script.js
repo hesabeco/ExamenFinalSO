@@ -1,5 +1,5 @@
 
-  let PROCESS = [];
+  /*let PROCESS = [];
   let cyclesDispatcher=0;
   let cyclesInterrupts=0;
 
@@ -44,7 +44,7 @@
     var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasNavbar'));
     offcanvas.show();
 
-  }*/
+  }
 
   function generateTables(cantidadProcesos) {
     var tableContainer = document.getElementById("table");
@@ -234,8 +234,7 @@
     }
     tableDataContainer.style.display = 'block';
 }
-
-
+*/
 
 
 
