@@ -57,82 +57,83 @@ function procesarinfoProcess(infoProcess) {
 
 function dispatcher() {
     // Crear una tabla HTML dinámica con el array PROCESS
-    var tabla = $("<table></table>"); // Usar jQuery para crear el elemento table
+    var table = $("<table></table>"); // Usar jQuery para crear el elemento table
+    createTable(table);
+  }
+
+
+// Crear una función que agregue una columna a una tabla
+function addCellToSide (table,time) {
+    // Recorrer todas las filas de la tabla
+    table.find("tr").each (function () {
+      var lastHeader = $(this).find("th").last();
+      var newHeader = $("<th>" + time + "</th>");
+      // Obtener la última celda de la fila actual
+      var lastCell = $(this).find("td").last();
+      // Crear una nueva celda con el texto "Nueva celda"
+      var newCell = $("<td></td>").addClass("grey");
+      // Agregar la nueva celda después de la última celda
+      lastCell.after(newCell);
+      lastHeader.after(newHeader);
+    });
+  }
   
-    // Crea el encabezado de la tabla con el nombre del array
+ function createTable(table){
+       // Crea el encabezado de la tabla con el nombre del array
     var thead = $("<thead></thead>"); // Usar jQuery para crear el elemento thead
     var tr = $("<tr></tr>"); // Usar jQuery para crear el elemento tr
     var th = $("<th></th>"); // Usar jQuery para crear el elemento th
     th.append(document.createTextNode("process")); // Usar append para agregar el texto al th
     tr.append(th); // Usar append para agregar el th al tr
     thead.append(tr); // Usar append para agregar el tr al thead
-    tabla.append(thead); // Usar append para agregar el thead al table
+    table.append(thead); // Usar append para agregar el thead al table
   
     // Crea el cuerpo de la tabla
     var tbody = $("<tbody></tbody>"); // Usar jQuery para crear el elemento tbody
-    tabla.append(tbody); // Usar append para agregar el tbody al table
+    table.append(tbody); // Usar append para agregar el tbody al table
   
     // Crea las filas
     for (var i = 0; i < PROCESS.length; i++) {
       // Crea las filas de la tabla
-      var hilera = $("<tr></tr>"); // Usar jQuery para crear el elemento tr
+      var row = $("<tr></tr>"); // Usar jQuery para crear el elemento tr
   
       // Crea un elemento <td> y un nodo de texto, haz que el nodo de
       // texto sea el contenido de <td>, ubica el elemento <td> al final
       // de la hilera de la tabla
-      var celda = $("<td></td>"); // Usar jQuery para crear el elemento td
-      var textoCelda = document.createTextNode("Process " + (i + 1));
-      celda.append(textoCelda); // Usar append para agregar el texto al td
-      hilera.append(celda); // Usar append para agregar el td al tr
+      var cell = $("<td></td>"); // Usar jQuery para crear el elemento td
+      var textCell = document.createTextNode("Process " + (i + 1));
+      cell.append(textCell); // Usar append para agregar el texto al td
+      row.append(cell); // Usar append para agregar el td al tr
   
       // Agrega la hilera al final del cuerpo de la tabla
-      tbody.append(hilera); // Usar append para agregar el tr al tbody
+      tbody.append(row); // Usar append para agregar el tr al tbody
     }
-    var hileraDispatcher = $("<tr></tr>"); // Usar jQuery para crear el elemento tr
-    var celdaDispatcher = $("<td></td>"); // Usar jQuery para crear el elemento td
-    var textoCeldaDispatcher = document.createTextNode("Dispatcher");
-    celdaDispatcher.append(textoCeldaDispatcher); // Usar append para agregar el texto al td
-    hileraDispatcher.append(celdaDispatcher); // Usar append para agregar el td al tr
-    tbody.append(hileraDispatcher); // Usar append para agregar el tr al tbody
+    var rowDispatcher = $("<tr></tr>"); // Usar jQuery para crear el elemento tr
+    var cellDispatcher = $("<td></td>"); // Usar jQuery para crear el elemento td
+    var textCellDispatcher = document.createTextNode("Dispatcher");
+    cellDispatcher.append(textCellDispatcher); // Usar append para agregar el texto al td
+    rowDispatcher.append(cellDispatcher); // Usar append para agregar el td al tr
+    tbody.append(rowDispatcher); // Usar append para agregar el tr al tbody
   
     // Agrega la tabla al cuerpo del documento
     time = 1;
-    $("body").append(tabla); // Usar jQuery para agregar el table al body
-  
+    $("body").append(table); // Usar jQuery para agregar el table al body
+    time = 1;
     // Llama a la función para agregar celdas al lado
-    agregarCeldaAlLado(tabla,time);
+    addCellToSide(table,time);
     time++;
-    agregarCeldaAlLado(tabla,time);
+    addCellToSide(table,time);
     time++;
-    agregarCeldaAlLado(tabla,time);
-    var firstRow = tabla[0].rows[0]; // Usar jQuery para acceder al primer elemento del objeto
+    addCellToSide(table,time);
+    var firstRow = table[0].rows[0]; // Usar jQuery para acceder al primer elemento del objeto
     var cellCount = firstRow.cells.length;
     console.log(cellCount);
     // Obtener la celda en la fila 2 y la columna 3
-    var celda = tabla.find("tr:eq(1) td:eq(1)");
+    var cell = table.find("tr:eq(1) td:eq(1)");
     // Cambiar el color de fondo de la celda a rojo
-    celda.css("background-color", "red"); // Usar jQuery para cambiar el estilo de la celda
+    cell.css("background-color", "red"); // Usar jQuery para cambiar el estilo de la celda
 
-  }
-
-
-// Crear una función que agregue una columna a una tabla
-function agregarCeldaAlLado (tabla,time) {
-    // Recorrer todas las filas de la tabla
-    tabla.find("tr").each (function () {
-      var ultimoEncabezado = $(this).find("th").last();
-      var nuevoEncabezado = $("<th>" + time + "</th>");
-      // Obtener la última celda de la fila actual
-      var ultimaCelda = $(this).find("td").last();
-      // Crear una nueva celda con el texto "Nueva celda"
-      var nuevaCelda = $("<td></td>").addClass("grey");
-      // Agregar la nueva celda después de la última celda
-      ultimaCelda.after(nuevaCelda);
-      ultimoEncabezado.after(nuevoEncabezado);
-    });
-  }
-  
-
+ }
  function readAndDisplayData() {
       // read window :
       cyclesDispatcher = prompt("Dispatcher Cycles:");
@@ -211,3 +212,5 @@ function agregarCeldaAlLado (tabla,time) {
         }
         return false;
       }
+
+      
