@@ -59,6 +59,16 @@ function dispatcher() {
     // Crear una tabla HTML dinámica con el array PROCESS
     var table = $("<table></table>"); // Usar jQuery para crear el elemento table
     createTable(table);
+    for (var i=0; i<PROCESS.length; i++){
+
+        for(var j=0; j<cyclesInterrupts; j++){
+            var element = PROCESS[1][2];
+            if (isNaN(element)) {
+                
+            }
+            else{
+
+            }
   }
 
 
@@ -116,7 +126,7 @@ function addCellToSide (table,time) {
     tbody.append(rowDispatcher); // Usar append para agregar el tr al tbody
   
     // Agrega la tabla al cuerpo del documento
-    time = 1;
+   /* time = 1;
     $("body").append(table); // Usar jQuery para agregar el table al body
     time = 1;
     // Llama a la función para agregar celdas al lado
@@ -131,7 +141,7 @@ function addCellToSide (table,time) {
     // Obtener la celda en la fila 2 y la columna 3
     var cell = table.find("tr:eq(1) td:eq(1)");
     // Cambiar el color de fondo de la celda a rojo
-    cell.css("background-color", "red"); // Usar jQuery para cambiar el estilo de la celda
+    cell.css("background-color", "red"); // Usar jQuery para cambiar el estilo de la celda*/
 
  }
  function readAndDisplayData() {
