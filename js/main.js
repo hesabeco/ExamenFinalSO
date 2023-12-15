@@ -59,99 +59,100 @@ function dispatcher() {
     var table = $("<table></table>"); // Usar jQuery para crear el elemento table
     createTable(table);
     time = 1;
-    var i=0;
+    var i = 0;
     while (!executionOfAllInstructions()) {
         for (var count = 0; count < PROCESS.length; count++) {
-            i = count % PROCESS.length; 
-            var existNextElement=false;
-            console.log(count);
+            i = count % PROCESS.length;
+            var existNextElement = false;
             var row = i + 1;
-            outerLoop: for (var j = 0; j < cyclesInterrupts; j++) {
-                var element = PROCESS[i][PCB[i][0]];
-                if (element === undefined) {
-                    break outerLoop;
-                }
-                console.log("element :" + element);
-                var column = time;
-                console.log("columna pinta " + column);
-                if (!isNaN(element)) {
-                    addCellToSide(table, time);
-                    var cell = table.find("tr:eq(" + row + ") td:eq(" + column + ")");
-                    cell.css("background-color", "green");
-                    PCB[i][0]++;
-                    if (PCB[i][0] === PROCESS[i].length) {
-                        PCB[i][1] = "R";
-                        PCB[i][2] = time;
-                    }
-                    time++;
-                    nextElement = PROCESS[i][PCB[i][0]];
-                    if (nextElement !== undefined && isNaN(nextElement)) {
-                        time=verifyIfNextIsFTI(table, time,row,column+1,i);
-                       existNextElement=true;
-                        break outerLoop;
-                    }
-                }
+            if (PROCESS[i].length === PCB[i][0]) {
+                continue;
             }
-            if (!executionOfAllInstructions() && !existNextElement) {
-                console.log("Probando :" + PROCESS.length + " " + column)
-                time = changeContext(table, time, PROCESS.length + 1, column);
-                console.log("Dispartcher :" + time);
-            }
+                outerLoop: for (var j = 0; j < cyclesInterrupts; j++) {
+                    var element = PROCESS[i][PCB[i][0]];
+                    var column = time;
+                    if (!isNaN(element)) {
+                        addCellToSide(table, time);
+                        var cell = table.find("tr:eq(" + row + ") td:eq(" + column + ")");
+                        cell.css("background-color", "green");
+                        PCB[i][0]++;
+                        if (PCB[i][0] === PROCESS[i].length) {
+                            PCB[i][1] = "R";
+                            PCB[i][2] = time;
+                            time++;
+                            break outerLoop;
+                        }
+                        time++;
+                        nextElement = PROCESS[i][PCB[i][0]];
+                        if (nextElement !== undefined && isNaN(nextElement)) {
+                            time = verifyIfNextIsFTI(table, time, row, column + 1, i);
+                            existNextElement = true;
+                            break outerLoop;
+                        }
+                    }
+                }
+                if (!executionOfAllInstructions() && !existNextElement) {
+                    console.log("Probando :" + PROCESS.length + " " + column)
+                    time = changeContext(table, time, PROCESS.length + 1, column);
+                    console.log("Dispartcher :" + time);
+                }
         }
     }
 }
 
-function verifyIfNextIsFTI(table, time,row,column,i){
+function verifyIfNextIsFTI(table, time, row, column, i) {
     addCellToSide(table, time);
-    var countIT=0;
-    var columnIT=0;
-    outerLoop: while(isNaN(PROCESS[i][PCB[i][0]])){
-        if(PROCESS[i][PCB[i][0]]==="F"){
-            if(countIT>0){
-                addCellToSide(table, time);
-            }
+    var countI = 0;
+    var countT = 0;
+    var columnIT = 0;
+    var lastState = 0;
+    outerLoop: while (isNaN(PROCESS[i][PCB[i][0]])) {
+        if (PROCESS[i][PCB[i][0]] === "F") {
             var cell = table.find("tr:eq(" + row + ") td:eq(" + column + ")");
             cell.css("background-color", "yellow");
-            PCB[i][0]=PCB[i][0]+1;
+            PCB[i][0] = PCB[i][0] + 1;
             if (PCB[i][0] === PROCESS[i].length) {
                 PCB[i][1] = "F";
                 PCB[i][2] = time;
             }
-            if(!executionOfAllInstructions()){
-                time=changeContextforF(table, time, PROCESS.length + 1, column);
+            if (!executionOfAllInstructions()) {
+                time = changeContextforF(table, time, PROCESS.length + 1, column);
             }
             break outerLoop;
         }
         if (["I", "T"].includes(PROCESS[i][PCB[i][0]])) {
-            if(countIT>0){
+            lastState = PROCESS[i][PCB[i][0]];
+            if (countI > 0 || countI > 0) {
                 addCellToSide(table, time);
             }
-            if(countIT===1){
-                columnIT=column-1;
+            if (countI === 1 || countI === 1) {
+                columnIT = column - 1;
             }
             var cell = table.find("tr:eq(" + row + ") td:eq(" + column + ")");
             cell.css("background-color", "red");
-            PCB[i][0]=PCB[i][0]+1;
+            PCB[i][0] = PCB[i][0] + 1;
             if (PCB[i][0] === PROCESS[i].length) {
                 PCB[i][1] = (PROCESS[i][PCB[i][0]]);
                 PCB[i][2] = time;
             }
-            countIT++;
+            if (lastState === 'I') { countI++; }
+            else { countT++; }
             time++;
         }
-        column=time;
+        column = time;
     }
-    if(columnIT!==0){
+    if (columnIT !== 0) {
         changeContextforITs(table, time, PROCESS.length + 1, columnIT)
     }
-    else{
-        if(countIT!=0){
-        time=changeContextforOneIT(table, time, PROCESS.length + 1, column-1)-1;
+    else {
+        if (countI != 0 || countT != 0) {
+            time = changeContextforOneIT(table, time, PROCESS.length + 1, column - 1) - 1;
         }
     }
-    if(countIT>cyclesDispatcher && !executionOfAllInstructions()){
-        time=changeContext(table, time, PROCESS.length + 1, column-1);
-        countIT=0;
+    if ((countI > cyclesDispatcher || countT > cyclesDispatcher) && !executionOfAllInstructions()) {
+        time = changeContext(table, time, PROCESS.length + 1, column - 1);
+        countI = 0;
+        countI = 0;
     }
     return time;
 }
@@ -173,7 +174,7 @@ function changeContextforF(table, time, row, column) {
         cell.css("background-color", "green");
         column++;
         time++;
-        if(i!==cyclesDispatcher-1){addCellToSide(table, time)};
+        if (i !== cyclesDispatcher - 1) { addCellToSide(table, time) };
     }
     return time;
 }
@@ -183,7 +184,7 @@ function changeContextforOneIT(table, time, row, column) {
         var cell = table.find("tr:eq(" + row + ") td:eq(" + column + ")");
         cell.css("background-color", "green");
         column++;
-        if(i!==cyclesDispatcher-1){addCellToSide(table, time)};
+        if (i !== cyclesDispatcher - 1) { addCellToSide(table, time) };
         time++;
     }
     return time;
@@ -308,13 +309,13 @@ function validateElements(elements) {
                 break;
             }
         } else {
-            const number = parseInt(element);
-            if (!Number.isInteger(number)) {
+
+            if (element.includes('.')) {
                 isValid = false;
                 alert("Invalid input: " + element + ". Should be an integer.");
                 break;
             }
-            
+            const number = parseInt(element);
             if (i !== 0 && number !== consecutiveNumber + 1) {
                 isValid = false;
                 alert("Invalid input: " + element + ". Should be consecutive.");
