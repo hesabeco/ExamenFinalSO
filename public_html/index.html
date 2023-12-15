@@ -114,7 +114,7 @@ table {
         <br><br>
         <div id="inputContainer">
             <p>From the previous labels you must write your string containing the information of the process. Each line of code is identified by a sequential number. </p>
-            <input type="text" id="processInput" placeholder="1,2,3,I,T...">
+            <input type="text" id="processInput" placeholder="1,2,3,I,T..." oninput="convertToUpperCase()">
             <button onclick="addProcess()">Add information Process</button>
             <p> Memory-loaded processes:
             <p id="size"></p>
@@ -186,7 +186,7 @@ table {
         <script src="js/vendor/bootstrap.min.js"></script>
 
         <script src="js/main.js"></script>
-
+        
 
     </body>
 </html>
