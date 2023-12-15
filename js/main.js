@@ -309,6 +309,12 @@ function validateElements(elements) {
             }
         } else {
             const number = parseInt(element);
+            if (!Number.isInteger(number)) {
+                isValid = false;
+                alert("Invalid input: " + element + ". Should be an integer.");
+                break;
+            }
+            
             if (i !== 0 && number !== consecutiveNumber + 1) {
                 isValid = false;
                 alert("Invalid input: " + element + ". Should be consecutive.");
