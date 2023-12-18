@@ -53,7 +53,7 @@ function procesarinfoProcess(infoProcess) {
     // En este ejemplo, simplemente devolvemos la longitud de la infoProcess
     return infoProcess.length;
 }
-/*
+
 function dispatcher() {
     // Crear una tabla HTML dinámica con el array PROCESS
     var table = $("<table></table>"); // Usar jQuery para crear el elemento table
@@ -104,7 +104,8 @@ function dispatcher() {
             }
         }
     }
-    console.log(PCB)
+    highlightProcess(table);
+    runDispatcher();
 }
 
 function verifyIfNextIsFTI(table, time, row, column, i) {
@@ -181,7 +182,7 @@ function verifyIfNextIsFTI(table, time, row, column, i) {
     }
     return time;
 }
-*/
+
 function changeContext(table, time, row, column) {
     for (var i = 0; i < cyclesDispatcher; i++) {
         column++;
@@ -391,7 +392,7 @@ function deepIncludes(arr, value) {
     }
     return false;
 }
-
+/*
 function dispatcher() {
     // Crear una tabla HTML dinámica con el array PROCESS
     var table = $("<table></table>"); // Usar jQuery para crear el elemento table
@@ -513,6 +514,7 @@ function verifyIfNextIsFTI(table, time, row, column, i) {
     }
     return time;
 }
+*/
 function convertToUpperCase() {
     var inputField = document.getElementById("processInput");
     var cursorPosition = inputField.selectionStart;
