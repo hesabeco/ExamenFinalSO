@@ -265,125 +265,129 @@ function deepIncludes(arr, value) {
 }
 
 function dispatcher() {
-    // Crear una tabla HTML dinámica con el array PROCESS
-    var table = $("<table></table>"); // Usar jQuery para crear el elemento table
-    createTable(table);
-    time = 1;
-    var i = 0;
-    while (!executionOfAllInstructions()) {
-        for (var count = 0; count < PROCESS.length; count++) {
-            i = count % PROCESS.length;
-            var existNextElement = false;
-            var row = i + 1;
-            if (PROCESS[i].length === PCB[i][0]) {
-                continue;
-            }
-            outerLoop: for (var j = 0; j < cyclesInterrupts; j++) {
-                var element = PROCESS[i][PCB[i][0]];
-                var column = time;
-                if (element === "F") {
-                    addCellToSide(table, time);
-                    time = instructionF(table, time, row, column, i);
-                    existNextElement = true;
-                    break outerLoop;
+    if (PROCESS.length === 0 || cyclesDispatcher === 0 || cyclesInterrupts === 0) {
+        // Mostrar una alarma indicando que faltan datos
+        alert("Please enter data for the process and cycles before running the Dispatcher.");
+    } else {
+        // Crear una tabla HTML dinámica con el array PROCESS
+        var table = $("<table></table>"); // Usar jQuery para crear el elemento table
+        createTable(table);
+        time = 1;
+        var i = 0;
+        while (!executionOfAllInstructions()) {
+            for (var count = 0; count < PROCESS.length; count++) {
+                i = count % PROCESS.length;
+                var existNextElement = false;
+                var row = i + 1;
+                if (PROCESS[i].length === PCB[i][0]) {
+                    continue;
                 }
-                if (!isNaN(element)) {
-                    addCellToSide(table, time);
-                    var cell = table.find("tr:eq(" + row + ") td:eq(" + column + ")");
-                    cell.css("background-color", "green");
-                    PCB[i][0]++;
-                    if (PCB[i][0] === PROCESS[i].length) {
-                        PCB[i][1] = time;
-                        PCB[i][2] = "R";
-                        time++;
+                outerLoop: for (var j = 0; j < cyclesInterrupts; j++) {
+                    var element = PROCESS[i][PCB[i][0]];
+                    var column = time;
+                    if (element === "F") {
+                        addCellToSide(table, time);
+                        time = instructionF(table, time, row, column, i);
+                        existNextElement = true;
                         break outerLoop;
                     }
-                    time++;
-                    nextElement = PROCESS[i][PCB[i][0]];
-                    if (nextElement !== undefined && isNaN(nextElement)) {
-                        time = verifyIfNextIsFTI(table, time, row, column + 1, i);
+                    if (!isNaN(element)) {
+                        addCellToSide(table, time);
+                        var cell = table.find("tr:eq(" + row + ") td:eq(" + column + ")");
+                        cell.css("background-color", "green");
+                        PCB[i][0]++;
+                        if (PCB[i][0] === PROCESS[i].length) {
+                            PCB[i][1] = time;
+                            PCB[i][2] = "R";
+                            time++;
+                            break outerLoop;
+                        }
+                        time++;
+                        nextElement = PROCESS[i][PCB[i][0]];
+                        if (nextElement !== undefined && isNaN(nextElement)) {
+                            time = verifyIfNextIsFTI(table, time, row, column + 1, i);
+                            existNextElement = true;
+                            break outerLoop;
+                        }
+                    }
+                    else {
+                        time = verifyIfNextIsFTI(table, time, row, column, i);
                         existNextElement = true;
                         break outerLoop;
                     }
                 }
-                else {
-                    time = verifyIfNextIsFTI(table, time, row, column, i);
-                    existNextElement = true;
-                    break outerLoop;
+                if (!executionOfAllInstructions() && !existNextElement) {
+                    time = changeContext(table, time, PROCESS.length + 1, column);
                 }
             }
-            if (!executionOfAllInstructions() && !existNextElement) {
-                time = changeContext(table, time, PROCESS.length + 1, column);
-            }
         }
+        highlightProcess(table);
+        runDispatcher();
     }
-    highlightProcess(table);
-    runDispatcher();
-}
 
-function verifyIfNextIsFTI(table, time, row, column, i) {
-    addCellToSide(table, time);
-    var countIT = 0, columnIT = 0, lastState = 0;
-    same = true;
-    outerLoop: while (isNaN(PROCESS[i][PCB[i][0]]) && same) {
-        if (PROCESS[i][PCB[i][0]] === "F") {
-            time = instructionF(table, time, row, column, i);
-            break outerLoop;
-        }
-        if (["I", "T"].includes(PROCESS[i][PCB[i][0]])) {
-            lastState = PROCESS[i][PCB[i][0]];
-            var cell = table.find("tr:eq(" + row + ") td:eq(" + column + ")");
-            cell.css("background-color", "red");
-            countIT++;
-            PCB[i][0] = PCB[i][0] + 1;
-            if (PCB[i][0] === PROCESS[i].length) {
-                PCB[i][1] = time;
-                PCB[i][2] = (PROCESS[i][PCB[i][0] - 1]);
-            }
-            nextElement = PROCESS[i][PCB[i][0]];
-            same = false;
-            if (nextElement !== undefined) {
-                if (nextElement === "F" && columnIT === 0) {
-                    same = true;
-                }
-                if (nextElement === "F" && columnIT !== 0) {
-                    same = false;
-                    continue;
-                }
-                if (nextElement === "I" || nextElement==="T") {
-                    if (columnIT === 0) { columnIT = column };
-                    same = true;
-                    time++;
-                    column = time;
-                    addCellToSide(table, time);
-                    continue;
-                }
-                else {
-                    if (columnIT === 0) {
-                        time = changeContextforOneIT(table, time, PROCESS.length + 1, column);
-                        nextElement = PROCESS[i][PCB[i][0]];
-                        same = false;
-                        // if (nextElement === "F") { addCellToSide(table, time); same = true; }
-                    }
-                }
-
-            }
-            else {
-                time = changeContextforOneIT(table, time, PROCESS.length + 1, column);
-            }
-        }
-        column = time;
-    }
-    if (columnIT !== 0) {
-        changeContextforITs(table, time, PROCESS.length + 1, columnIT)
-        time = (countIT === cyclesDispatcher) ? ++time : time;
-    }
-    if (countIT > cyclesDispatcher && !executionOfAllInstructions()) {
-        time = changeContext(table, time + 1, PROCESS.length + 1, column);
-        countIT = 0;
+    function verifyIfNextIsFTI(table, time, row, column, i) {
+        addCellToSide(table, time);
+        var countIT = 0, columnIT = 0, lastState = 0;
         same = true;
+        outerLoop: while (isNaN(PROCESS[i][PCB[i][0]]) && same) {
+            if (PROCESS[i][PCB[i][0]] === "F") {
+                time = instructionF(table, time, row, column, i);
+                break outerLoop;
+            }
+            if (["I", "T"].includes(PROCESS[i][PCB[i][0]])) {
+                lastState = PROCESS[i][PCB[i][0]];
+                var cell = table.find("tr:eq(" + row + ") td:eq(" + column + ")");
+                cell.css("background-color", "red");
+                countIT++;
+                PCB[i][0] = PCB[i][0] + 1;
+                if (PCB[i][0] === PROCESS[i].length) {
+                    PCB[i][1] = time;
+                    PCB[i][2] = (PROCESS[i][PCB[i][0] - 1]);
+                }
+                nextElement = PROCESS[i][PCB[i][0]];
+                same = false;
+                if (nextElement !== undefined) {
+                    if (nextElement === "F" && columnIT === 0) {
+                        same = true;
+                    }
+                    if (nextElement === "F" && columnIT !== 0) {
+                        same = false;
+                        continue;
+                    }
+                    if (nextElement === "I" || nextElement === "T") {
+                        if (columnIT === 0) { columnIT = column };
+                        same = true;
+                        time++;
+                        column = time;
+                        addCellToSide(table, time);
+                        continue;
+                    }
+                    else {
+                        if (columnIT === 0) {
+                            time = changeContextforOneIT(table, time, PROCESS.length + 1, column);
+                            nextElement = PROCESS[i][PCB[i][0]];
+                            same = false;
+                        }
+                    }
+
+                }
+                else {
+                    time = changeContextforOneIT(table, time, PROCESS.length + 1, column);
+                }
+            }
+            column = time;
+        }
+        if (columnIT !== 0) {
+            changeContextforITs(table, time, PROCESS.length + 1, columnIT)
+            time = (countIT === cyclesDispatcher) ? ++time : time;
+        }
+        if (countIT > cyclesDispatcher && !executionOfAllInstructions()) {
+            time = changeContext(table, time + 1, PROCESS.length + 1, column);
+            countIT = 0;
+            same = true;
+        }
+        return time;
     }
-    return time;
 }
 
 function convertToUpperCase() {
@@ -495,7 +499,7 @@ function highlightProcess(table) {
             var highlightEnd = maxExecutionTime;
 
             // Pintar desde la posición actual hasta el tiempo máximo
-            highlightRow(table, i, currentPosition+1, highlightEnd);
+            highlightRow(table, i, currentPosition + 1, highlightEnd);
         }
     }
 }
@@ -504,7 +508,7 @@ function highlightRow(table, rowNumber, start, end) {
     // Obtener la fila correspondiente
     var row = table.find("tr:eq(" + (rowNumber + 1) + ")"); // Se suma 1 porque los índices de las filas comienzan desde 1 en lugar de 0
 
-    // Iterar sobre las celdas de la fila y aplicar el resaltado
+    // Iterar sobre las celdas de la fila y rellena los rojos en procesos con estado final bloqueado
     if (end !== start) {
         for (var j = start; j <= end; j++) {
             var cell = row.find("td:eq(" + j + ")");
