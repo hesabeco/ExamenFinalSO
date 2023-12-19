@@ -632,7 +632,7 @@ function insertBlocking(table, auxiliaryTime, rown, column) {
         cellOut = $("<td></td>").text("TIME OUT");
     }
     else {
-        cellOut = $("<td></td>").text("I/O REQUES");
+        cellOut = $("<td></td>").text("I/O REQUEST");
     }
 
     row.append(cellinfoProcess, cellOut);
