@@ -53,136 +53,7 @@ function procesarinfoProcess(infoProcess) {
     // En este ejemplo, simplemente devolvemos la longitud de la infoProcess
     return infoProcess.length;
 }
-/*
-function dispatcher() {
-    // Crear una tabla HTML dinámica con el array PROCESS
-    var table = $("<table></table>"); // Usar jQuery para crear el elemento table
-    createTable(table);
-    time = 1;
-    var i = 0;
-    while (!executionOfAllInstructions()) {
-        for (var count = 0; count < PROCESS.length; count++) {
-            i = count % PROCESS.length;
-            var existNextElement = false;
-            var row = i + 1;
-            if (PROCESS[i].length === PCB[i][0]) {
-                continue;
-            }
-            outerLoop: for (var j = 0; j < cyclesInterrupts; j++) {
-                var element = PROCESS[i][PCB[i][0]];
-                console.log(element);
-                var column = time;
-                if (!isNaN(element)) {
-                    addCellToSide(table, time);
-                    var cell = table.find("tr:eq(" + row + ") td:eq(" + column + ")");
-                    cell.css("background-color", "green");
-                    PCB[i][0]++;
-                    if (PCB[i][0] === PROCESS[i].length) {
-                        PCB[i][1] = time;
-                        PCB[i][2] = "R";
-                        time++;
-                        break outerLoop;
-                    }
-                    time++;
-                    nextElement = PROCESS[i][PCB[i][0]];
-                    if (nextElement !== undefined && isNaN(nextElement)) {
-                        time = verifyIfNextIsFTI(table, time, row, column + 1, i);
-                        existNextElement = true;
-                        break outerLoop;
-                    }
-                }
-                else{
-                    time = verifyIfNextIsFTI(table, time, row, column, i);
-                    existNextElement = true;
-                    break outerLoop;
-                }
-            }
-            if (!executionOfAllInstructions() && !existNextElement) {
-                console.log("Probando :" + PROCESS.length + " " + column)
-                time = changeContext(table, time, PROCESS.length + 1, column);
-                console.log("Dispartcher :" + time);
-            }
-        }
-    }
-    highlightProcess(table);
-    runDispatcher();
-}
 
-function verifyIfNextIsFTI(table, time, row, column, i) {
-    addCellToSide(table, time);
-    var countIT = 0, columnIT = 0, lastState = 0;
-    same = true;
-    outerLoop: while (isNaN(PROCESS[i][PCB[i][0]]) && same) {
-        if (PROCESS[i][PCB[i][0]] === "F") {
-            time = instructionF(table, time, row, column, i);
-            break outerLoop;
-        }
-        if (["I", "T"].includes(PROCESS[i][PCB[i][0]])) {
-            lastState = PROCESS[i][PCB[i][0]];
-            var cell = table.find("tr:eq(" + row + ") td:eq(" + column + ")");
-            cell.css("background-color", "red");
-            countIT++;
-            PCB[i][0] = PCB[i][0] + 1;
-            if (PCB[i][0] === PROCESS[i].length) {
-                PCB[i][1] = time;
-                PCB[i][2] = (PROCESS[i][PCB[i][0]-1]);
-            }
-            nextElement = PROCESS[i][PCB[i][0]];
-            same = false;
-            if (nextElement !== undefined) {
-                if (nextElement === "F" && columnIT===0) {
-                    same = true;
-                }
-                if(nextElement === "F" && columnIT!==0){
-                    same=false;
-                    continue;
-                }
-                if (nextElement === lastState) {
-                    if (columnIT === 0) { columnIT = column };
-                    same = true;
-                    time++;
-                    column = time;
-                    addCellToSide(table, time);
-                    continue;
-                }
-                else {
-                    if (columnIT === 0) {
-                        time = changeContextforOneIT(table, time, PROCESS.length + 1, column);
-                        nextElement = PROCESS[i][PCB[i][0]];
-                        same=false;
-                       if (nextElement === "F") { addCellToSide(table, time); same = true; }
-                    }
-                }
-
-            }
-            else{
-                time = changeContextforOneIT(table, time, PROCESS.length + 1, column);
-            }
-        }
-        column = time;
-    }
-    if (columnIT !== 0) {
-        changeContextforITs(table, time, PROCESS.length + 1, columnIT);
-        if(countIT === cyclesDispatcher){
-            time++;
-            if ( nextElement==="F"){
-            addCellToSide(table,time);
-            time=instructionF(table, time, row, column+1, i);
-            }
-        }
-        
-    }
-    if (countIT > cyclesDispatcher && !executionOfAllInstructions()) {
-        time = changeContext(table, time+1, PROCESS.length + 1, column);
-        if(nextElement==="F"){
-        addCellToSide(table,time);
-        column = time;
-        time=instructionF(table, time, row, column, i) }
-        countIT = 0;
-    }
-    return time;
-}
-*/
 function changeContext(table, time, row, column) {
     for (var i = 0; i < cyclesDispatcher; i++) {
         column++;
@@ -311,7 +182,7 @@ function readAndDisplayData() {
     cyclesDispatcher = parseInt(cyclesDispatcher);
     cyclesInterrupts = parseInt(cyclesInterrupts);
 
-    if (isNaN(cyclesDispatcher) || isNaN(cyclesInterrupts) || cyclesDispatcher <= 0 || cyclesDispatcher >= 100) {
+    if (isNaN(cyclesDispatcher) || isNaN(cyclesInterrupts) || cyclesDispatcher <= 0 || cyclesDispatcher >= 100 || cyclesInterrupts < cyclesDispatcher) {
         alert("Invalid input. Please enter valid values. Dispatcher Cycles should be greater than 0, and Interrupts Cycles should be greater or equal to Dispatcher Cycles.");
         return;
     }
@@ -479,7 +350,7 @@ function verifyIfNextIsFTI(table, time, row, column, i) {
                     same = false;
                     continue;
                 }
-                if (nextElement === lastState) {
+                if (nextElement === "I" || nextElement==="T") {
                     if (columnIT === 0) { columnIT = column };
                     same = true;
                     time++;
