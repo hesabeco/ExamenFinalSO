@@ -323,6 +323,7 @@ function dispatcher() {
         }
         highlightProcess(table);
         runDispatcher();
+        combinedTrace();
     }
 
     function verifyIfNextIsFTI(table, time, row, column, i) {
@@ -515,4 +516,201 @@ function highlightRow(table, rowNumber, start, end) {
             cell.css("background-color", "red");
         }
     }
+}
+
+function combinedTrace() {
+    var PCBTrace = new Array(PROCESS.length).fill(0);
+    var tableCombined = $("<table></table>"); // Usar jQuery para crear el elemento table
+    //Crea la estrcuutra de la tabla
+    var tableInfo = createTable3(tableCombined);
+    //Declaracion de variables 
+    let currentProcessIndex = 0,
+        auxiliaryTime = 1,
+        breakCount = 0;
+
+    //Ciclo que controla el salto de linea
+    while (currentProcessIndex < PROCESS.length) {
+        let j = 0,
+           // auxiliary = pointer;
+           auxiliary = PCBTrace[currentProcessIndex];
+
+        while (j < cyclesInterrupts) {
+
+            //Valida si llego al final de la matriz de procesos
+            if (currentProcessIndex >= PROCESS.length || auxiliary >= PROCESS[currentProcessIndex].length || PROCESS[currentProcessIndex][auxiliary] == undefined) {
+                breakCount++;
+                break;
+            }
+
+            //Valida si es finalizacion del proceso
+            if (PROCESS[currentProcessIndex][auxiliary] === "F") {
+                let help=auxiliaryTime;
+                auxiliaryTime = insertFinaly(tableCombined, auxiliaryTime);
+                help=auxiliaryTime-help;
+                auxiliary+=help;
+                break;
+            }
+
+            //Valida si es un caracter especial 
+            if (PROCESS[currentProcessIndex][auxiliary] === "T" || PROCESS[currentProcessIndex][auxiliary] === "I") {
+                let help=auxiliaryTime;
+                auxiliaryTime = insertBlocking(tableCombined, auxiliaryTime, currentProcessIndex, auxiliary);
+                help=auxiliaryTime-help;
+                auxiliary+=help;
+                break;
+ 
+            }
+            else {
+                //Funciona si es un numero
+                console.log("ESte es el contador: " + auxiliaryTime);
+                const row = $('<tr></tr>');
+                const cellinfoProcess = $('<td></td>').text(auxiliaryTime);
+                const cellOut = $('<td></td>').text(PROCESS[currentProcessIndex][auxiliary]);
+                cellOut.css('background-color', 'green');
+                row.append(cellinfoProcess, cellOut);
+                tableInfo.tbody.append(row);
+                auxiliary++;
+                auxiliaryTime++;
+            }
+
+            //Valida la siguiente casilla
+
+            if (!isNaN(PROCESS[currentProcessIndex][auxiliary])) {
+                j++;
+            }
+
+        }
+
+       
+
+        if (auxiliary !== PCBTrace[currentProcessIndex]) {
+            auxiliaryTime = insertDispatcher(tableCombined, auxiliaryTime);
+        }
+
+        PCBTrace[currentProcessIndex] = auxiliary;
+        currentProcessIndex++;
+
+        if (currentProcessIndex === PROCESS.length) {
+ 
+            if (breakCount === PROCESS.length) {
+                break;
+            }
+
+            currentProcessIndex = 0;
+            breakCount = 0;
+        }
+
+        console.log(PCBTrace)
+    }
+
+    // Agrega la tabla al body usando jQuery
+    $("body").append(tableCombined);
+}
+
+function insertDispatcher(table, auxiliaryTime) {
+    console.log("El dispacher entro como: "+ auxiliaryTime);
+    for (let index = 0; index < cyclesDispatcher; index++) {
+        const row = $("<tr></tr>");
+        const cellinfoProcess = $("<td></td>").text(auxiliaryTime);
+        const cellOut = $("<td></td>").text(100 + index);
+
+        row.append(cellinfoProcess, cellOut);
+        table.append(row);
+
+        auxiliaryTime++;
+    }
+    console.log("Y sale como: " + auxiliaryTime);
+    return auxiliaryTime;
+}
+
+function insertBlocking(table, auxiliaryTime, rown, column) {
+    console.log(auxiliaryTime);
+    const row = $("<tr></tr>");
+    const cellinfoProcess = $("<td></td>").text(auxiliaryTime);
+    let cellOut = "";
+    if (PROCESS[rown][column] === "T") {
+        cellOut = $("<td></td>").text("TIME OUT");
+    }
+    else {
+        cellOut = $("<td></td>").text("I/O REQUES");
+    }
+
+    row.append(cellinfoProcess, cellOut);
+    table.append(row);
+
+    auxiliaryTime++;
+
+    if (PROCESS[rown][column + 1] === "T" || PROCESS[rown][column + 1] === "I") {
+        let z = 1;
+        while (PROCESS[rown][column + z] === "T" || PROCESS[rown][column + z] === "I") {
+            const row = $("<tr></tr>");
+            const cellinfoProcess = $("<td></td>").text(auxiliaryTime);
+            let cellOut = "";
+            if (PROCESS[rown][column + z] === "T") {
+                cellOut = $("<td></td>").text("TIME OUT");
+            }
+            else {
+                cellOut = $("<td></td>").text("I/O REQUES");
+            }
+
+            row.append(cellinfoProcess, cellOut);
+            table.append(row);
+
+            auxiliaryTime++;
+            z++;
+        }
+
+    }
+    console.log(auxiliaryTime);
+    return auxiliaryTime;
+}
+
+function insertFinaly(table, auxiliaryTime) {
+    const row = $("<tr></tr>");
+    const cellinfoProcess = $("<td></td>").text(auxiliaryTime);
+    const cellOut = $("<td></td>").text("FINISH TASK");
+
+    row.append(cellinfoProcess, cellOut);
+    table.append(row);
+
+    return auxiliaryTime+1; 
+}
+function createTable3(table) {
+    // Crea el encabezado de la tabla
+    var thead = $("<thead></thead>"); // Usar jQuery para crear el elemento thead
+    var tr = $("<tr></tr>"); // Usar jQuery para crear el elemento tr
+
+    // Columna "Time"
+    var thTime = $("<th></th>").text("Time"); // Usar jQuery para crear el elemento th y establecer el texto
+    tr.append(thTime); // Usar append para agregar el th al tr
+
+    // Columna "Trace"
+    var thTrace = $("<th></th>").text("Trace"); // Usar jQuery para crear el elemento th y establecer el texto
+    tr.append(thTrace); // Usar append para agregar el th al tr
+
+    thead.append(tr); // Usar append para agregar el tr al thead
+    table.append(thead); // Usar append para agregar el thead al table
+
+    // Crea el cuerpo de la tabla
+    var tbody = $("<tbody></tbody>"); // Usar jQuery para crear el elemento tbody
+    table.append(tbody); // Usar append para agregar el tbody al table
+
+    // Crea la fila del dispatcher
+    for (let i = 0; i < cyclesDispatcher; i++) {
+        const row = $('<tr></tr>');
+        const cellTimeDispatcher = $('<td></td>').text('');
+        const cellTraceDispatcher = $('<td></td>').text(100 + i);
+
+        row.append(cellTimeDispatcher, cellTraceDispatcher);
+        tbody.append(row);
+    }
+
+    // Agrega la tabla al body usando jQuery
+    $("body").append(table);
+
+    // Devuelve un objeto que contiene referencias importantes
+    return {
+        table: table,
+        tbody: tbody
+    };
 }
